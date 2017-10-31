@@ -376,6 +376,9 @@ proc getFileSize(f: File): int64 =
   result = getFilePos(f)
   setFilePos(f, oldPos)
 
+proc strerror(errnum: cint): cstring {.importc: "strerror", header: "<string.h>".}
+var errno {.importc: "errno", header: "<errno.h>".}: cint
+
 proc readFile(filename: string): TaintedString =
   var f: File
   if open(f, filename):
@@ -384,7 +387,7 @@ proc readFile(filename: string): TaintedString =
     finally:
       close(f)
   else:
-    sysFatal(IOError, "cannot open: ", filename)
+    sysFatal(IOError, "cannot open: ", filename & ". " & $strerror(errno))
 
 proc writeFile(filename, content: string) =
   var f: File
@@ -394,7 +397,7 @@ proc writeFile(filename, content: string) =
     finally:
       close(f)
   else:
-    sysFatal(IOError, "cannot open: ", filename)
+    sysFatal(IOError, "cannot open: ", filename & ". " & $strerror(errno))
 
 proc setStdIoUnbuffered() =
   when declared(stdout):
