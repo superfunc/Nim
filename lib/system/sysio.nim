@@ -377,7 +377,7 @@ proc getFileSize(f: File): int64 =
   setFilePos(f, oldPos)
 
 proc strerror(errnum: cint): cstring {.importc: "strerror", header: "<string.h>".}
-var errno {.importc: "errno", header: "<errno.h>".}: cint
+var errno {.importc, header: "<errno.h>".}: cint
 
 proc readFile(filename: string): TaintedString =
   var f: File
